@@ -14,9 +14,11 @@ namespace hypro {
 
     int initializeLogging(int &i) {
         carl::logging::logger().configure("logfile_hypro", "hypro.log");
+    	carl::logging::logger().configure("logfile_hypro_wip", "wip.log"); // testing scheduler synthesis
 
-        carl::logging::logger().configure("logfile_hypro_qe_redundancy_checks", "hypro_qe_number_of_constraints.log");
-        carl::logging::logger().filter("logfile_hypro_qe_redundancy_checks")("qe.redundancy_check", carl::logging::LogLevel::LVL_TRACE);
+    	carl::logging::logger().filter("logfile_hypro_wip")("hypro", carl::logging::LogLevel::LVL_TRACE)
+		("hypro.algorithms.qe", carl::logging::LogLevel::LVL_TRACE)
+		("hydra.worker", carl::logging::LogLevel::LVL_TRACE);
 
 //        carl::logging::logger().filter("logfile_hypro")("hypro.hPolytope", carl::logging::LogLevel::LVL_TRACE);
 //        carl::logging::logger().filter("logfile_hypro")("hypro.algorithms.qe", carl::logging::LogLevel::LVL_TRACE);
@@ -26,11 +28,11 @@ namespace hypro {
 
         carl::logging::logger().filter("logfile_hypro")("hypro", carl::logging::LogLevel::LVL_TRACE)(
                 "hypro.casestudies", carl::logging::LogLevel::LVL_INFO)("hypro.datastructures",
-                                                                        carl::logging::LogLevel::LVL_TRACE);("hypro.doubleDescriptionMethod",
+                                                                        carl::logging::LogLevel::LVL_TRACE)("hypro.doubleDescriptionMethod",
                                                                         carl::logging::LogLevel::LVL_TRACE);
 
-        carl::logging::logger().configure("pathfile_hypro", "unfinished_paths.log");
-        carl::logging::logger().filter("pathfile_hypro")("benchmark.paths", carl::logging::LogLevel::LVL_TRACE);
+   //     carl::logging::logger().configure("pathfile_hypro", "unfinished_paths.log");
+  //      carl::logging::logger().filter("pathfile_hypro")("benchmark.paths", carl::logging::LogLevel::LVL_TRACE);
 
         carl::logging::logger().configure("stdout", std::cout);
         carl::logging::logger().filter("stdout")("hypro", carl::logging::LogLevel::LVL_OFF)
