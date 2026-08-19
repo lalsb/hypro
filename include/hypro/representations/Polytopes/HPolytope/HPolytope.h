@@ -505,7 +505,6 @@ namespace hypro {
         void reduceNumberRepresentation(const std::vector<Point<double>> & = std::vector<Point<double>>(),
                                         unsigned = fReach_DENOMINATOR) const {}
 
-        std::string debugString(bool vertices = true) const;
 
         /// Serialization function required by cereal
         template<typename Archive>

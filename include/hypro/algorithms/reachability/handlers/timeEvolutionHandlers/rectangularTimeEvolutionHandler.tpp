@@ -255,13 +255,13 @@ PolyhedralRepresentation<Number, Converter, Setting> rectangularApplyReverseTime
     }
 
     template <typename Number>
-    std::pair<CarlPolytope<Number>, CarlPolytope<Number>> rectangularApplyReverseTimeEvolution( const CarlPolytope<Number> &badSet, const rectangularFlow<Number> &flow, const Condition<Number> &invariant, const Location<Number> *loc ) {
+    CarlPolytope<Number> rectangularApplyReverseTimeEvolution( const CarlPolytope<Number> &badSet, const rectangularFlow<Number> &flow, const Condition<Number> &invariant ) {
 #ifdef HYPRO_USE_QE_REDUNDANCY_CHECKS
         constexpr bool REMOVE_REDUNDANDY_IN_QE = true;
 #else
         constexpr bool REMOVE_REDUNDANDY_IN_QE = false;
 #endif
-        DEBUG ("hypro.worker", "rectangularApplyReverseTimeEvolution(segment, flow, invariant, loc)");
+
         auto& vpool = hypro::VariablePool::getInstance();
 
         // get bad state
@@ -303,7 +303,7 @@ PolyhedralRepresentation<Number, Converter, Setting> rectangularApplyReverseTime
         // add invariant constraints, if the invariant is specified and does not represent the empty set
         if ( !invariant.isTrue() ) {
             if ( invariant.isFalse() ) {
-                return std::make_pair(CarlPolytope<Number>::Empty(), CarlPolytope<Number>::Empty());
+                return CarlPolytope<Number>::Empty();
             } else {
                 auto invariantConstraints = halfspacesToConstraints<Number, hypro::tNumber>( invariant.getMatrix(), invariant.getVector() );
                 bad.addConstraints( invariantConstraints );
@@ -312,8 +312,6 @@ PolyhedralRepresentation<Number, Converter, Setting> rectangularApplyReverseTime
 
         TRACE( "hypro.worker", "Full constraint set describing the dynamic behavior: \n"
                 << bad );
-
-        CarlPolytope<Number> timeChoice;
 
         if(REMOVE_REDUNDANDY_IN_QE) {
             TRACE("qe.redundancy_check", "number of constraints during elimination: ");
@@ -328,10 +326,6 @@ PolyhedralRepresentation<Number, Converter, Setting> rectangularApplyReverseTime
             bad.setDimension( dim + variablesToEliminate.size() + 1); ///TODO
             bad.removeRedundancy();
             bad.eliminateVariablesSuccessivelyWithRedundancyCheck( quOrder );
-
-            timeChoice = bad;
-            TRACE( "hypro.worker", "Constraint set describing the time choice: \n"
-                << timeChoice );
 
             quOrder.at(0).second = std::vector<carl::Variable>{t};
 
@@ -353,15 +347,14 @@ PolyhedralRepresentation<Number, Converter, Setting> rectangularApplyReverseTime
 
         DEBUG( "hydra.worker", "State set after reverse time elapse: " << bad );
 
-        return std::make_pair(bad,  timeChoice);
+        return bad;
     }
 
     template <typename Number>
-    std::pair<CarlPolytope<Number>, CarlPolytope<Number>> rectangularApplyReverseTimeEvolution( const CarlPolytope<Number>& badSet, const Location<Number>* loc ) {
-        DEBUG ("hypro.worker", "rectangularApplyReverseTimeEvolution(segment, loc)");
+    CarlPolytope<Number> rectangularApplyReverseTimeEvolution( const CarlPolytope<Number>& badSet, const Location<Number>* loc ) {
         auto flow = loc->getRectangularFlow();
         auto invariant = loc->getInvariant();
-        return rectangularApplyReverseTimeEvolution(badSet, flow, invariant, loc);
+        return rectangularApplyReverseTimeEvolution(badSet, flow, invariant);
     }
 
 

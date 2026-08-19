@@ -384,29 +384,6 @@ namespace hypro {
     HPolytopeT<Number, Converter, Setting>::~HPolytopeT() {
     }
 
-    template<typename Number, typename Converter, typename Setting>
-    std::string HPolytopeT<Number,Converter,Setting>::debugString(bool vertices) const {
-        std::stringstream ss;
-        try {
-            if (vertices) {
-                ss << *this;
-            } else {
-                auto verts = this->vertices();
-                ss << "[ ";
-                for ( std::size_t i = 0; i < verts.size(); ++i ) {
-                    ss << convert<Number, double>( verts[i] );
-                    if ( i < verts.size() - 1 ) {
-                        ss << ", ";
-                    }
-                }
-                ss << " ]";
-            }
-        } catch ( ... ) {
-            return "Error in debugString";
-        }
-        return ss.str();
-    }
-
 /*
  * Getters and setters
  */

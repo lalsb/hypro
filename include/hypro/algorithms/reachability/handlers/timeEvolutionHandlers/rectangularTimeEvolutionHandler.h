@@ -46,45 +46,39 @@ namespace hypro {
                                          const rectangularFlow<Number> &flow, tNumber timeBound);
 
     template<typename Number>
-	std::pair<CarlPolytope<Number>, CarlPolytope<Number>>
+    CarlPolytope<Number>
     rectangularApplyReverseTimeEvolution(const CarlPolytope<Number> &badSet, const Location<Number> *loc);
 
 	template<typename Number>
-	std::pair<CarlPolytope<Number>, CarlPolytope<Number>>
-	rectangularApplyReverseTimeEvolution(const CarlPolytope<Number> &badSet, const rectangularFlow<Number> &flow, const Condition<Number> &invariant, const Location<Number> *loc);
+	CarlPolytope<Number>
+	rectangularApplyReverseTimeEvolution(const CarlPolytope<Number> &badSet, const rectangularFlow<Number> &flow, const Condition<Number> &invariant);
 
     template<typename Number>
     CarlPolytope<Number> rectangularUnderapproximateReverseTimeEvolution(const CarlPolytope<Number> &badSet,
                                                                          const rectangularFlow<Number> &flow);
 	template<template<typename, typename, typename> class PolyhedralRepresentation, typename Number, typename Converter, typename Setting, enable_if<!std::is_same_v<CarlPolytope<Number>, PolyhedralRepresentation<Number, Converter, Setting>>> = 0>
-	std::pair<PolyhedralRepresentation<Number, Converter, Setting>, PolyhedralRepresentation<Number, Converter, Setting>>
-	rectangularApplyReverseTimeEvolution(const PolyhedralRepresentation<Number, Converter, Setting> &badSet, const rectangularFlow<Number> &flow, const Condition<Number> &invariant, const Location<Number> *loc) {
+	PolyhedralRepresentation<Number, Converter, Setting>
+	rectangularApplyReverseTimeEvolution(const PolyhedralRepresentation<Number, Converter, Setting> &badSet, const rectangularFlow<Number> &flow, const Condition<Number> &invariant) {
 		auto convertedSet = Converter::toCarlPolytope(badSet);
-		auto [convertedResult, convertedTimeChoice] = rectangularApplyReverseTimeEvolution(convertedSet, flow, invariant, loc);
+		auto convertedResult = rectangularApplyReverseTimeEvolution(convertedSet, flow, invariant);
 		// std::cout << __func__ << ": Set before conversion: " << convertedResult << std::endl;
-		PolyhedralRepresentation<Number, Converter, Setting> res, time;
+		PolyhedralRepresentation<Number, Converter, Setting> res;
 		convert(convertedResult, res);
-		convert(convertedTimeChoice, time);
 		// std::cout << __func__ << ": Set after conversion: " << res << std::endl;
-		return std::make_pair(res, time);
+		return res;
 	}
 
     template<template<typename, typename, typename> class PolyhedralRepresentation, typename Number, typename Converter, typename Setting, enable_if<!std::is_same_v<CarlPolytope<Number>, PolyhedralRepresentation<Number, Converter, Setting>>> = 0>
-	std::pair<PolyhedralRepresentation<Number, Converter, Setting>, PolyhedralRepresentation<Number, Converter, Setting>>
+    PolyhedralRepresentation<Number, Converter, Setting>
     rectangularApplyReverseTimeEvolution(const PolyhedralRepresentation<Number, Converter, Setting> &badSet,
                                          const Location<Number> *loc) {
-
-		DEBUG ("hypro.worker", "=======================================================================" );
-		DEBUG ("hypro.worker", "<PolyhedralRepresentation> rectangularApplyReverseTimeEvolution" );
         auto convertedSet = Converter::toCarlPolytope(badSet);
-        auto [convertedResult, convertedTimeChoice] = rectangularApplyReverseTimeEvolution(convertedSet, loc);
+        auto convertedResult = rectangularApplyReverseTimeEvolution(convertedSet, loc);
         // std::cout << __func__ << ": Set before conversion: " << convertedResult << std::endl;
-        PolyhedralRepresentation<Number, Converter, Setting> res, time;
+        PolyhedralRepresentation<Number, Converter, Setting> res;
         convert(convertedResult, res);
-		convert(convertedTimeChoice, time);
         // std::cout << __func__ << ": Set after conversion: " << res << std::endl;
-		DEBUG ("hypro.worker", "=======================================================================" );
-		return std::make_pair(res, time);
+        return res;
     }
 
     template<template<typename, typename, typename> class PolyhedralRepresentation, typename Number, typename Converter, typename Setting, enable_if<!std::is_same_v<CarlPolytope<Number>, PolyhedralRepresentation<Number, Converter, Setting>>> = 0>
@@ -98,28 +92,6 @@ namespace hypro {
         convert(convertedResult, res);
         return res;
     }
-
-	template<template<typename, typename, typename> class PolyhedralRepresentation, typename Number, typename Converter, typename Setting, enable_if<!std::is_same_v<CarlPolytope<Number>, PolyhedralRepresentation<Number, Converter, Setting>>> = 0>
-	    PolyhedralRepresentation<Number, Converter, Setting>
-	    substituteVariable(const PolyhedralRepresentation<Number, Converter, Setting> &set, carl::Variable oldvar, carl::Variable newVar) {
-			auto convertedSet = Converter::toCarlPolytope(set);
-			TRACE( "hypro.representations", "273647382 Substitute variable " << oldvar << " with " << newVar << " in set " << convertedSet );
-			convertedSet.substituteVariable(oldvar, newVar);
-			PolyhedralRepresentation<Number, Converter, Setting> res;
-			convert(convertedSet, res);
-			return res;
-	}
-
-	template<template<typename, typename, typename> class PolyhedralRepresentation, typename Number, typename Converter, typename Setting, enable_if<!std::is_same_v<CarlPolytope<Number>, PolyhedralRepresentation<Number, Converter, Setting>>> = 0>
-	    PolyhedralRepresentation<Number, Converter, Setting>
-	    addConstraint(const PolyhedralRepresentation<Number, Converter, Setting> &all, carl::Variable var) {
-			auto convertedSet = Converter::toCarlPolytope(all);
-			convertedSet.addConstraint( ConstraintT<hypro::tNumber>( PolyT<hypro::tNumber>( var), carl::Relation::GEQ ) );
-			PolyhedralRepresentation<Number, Converter, Setting> res;
-			convert(convertedSet, res);
-			return res;
-	}
-
 
     template<typename Number>
     CarlPolytope<Number>
